@@ -49,20 +49,20 @@
 .App {
   text-align: center;
   padding: 2rem;
-  font-family: "Avenir Next", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Cherry Bomb One","Avenir Next", "Helvetica Neue", Helvetica, Arial, sans-serif;
   transition: background-color 1s ease, color 1s ease;
   min-height: 100vh;
 }
 
 /* Light theme */
 .light {
-  background-color: #bdc9db;
+  background-color: #d2e0f4;
   color: #4f46e5;
 }
 
 /* Dark theme */
 .dark {
-  background-color: #aac9b9;
+  background-color: #c2ffdf;
   color: #4f46e5;
 }
 
@@ -71,13 +71,15 @@ h1 {
   font-family: "Cherry Bomb One", system-ui;
   font-weight: 100;
   font-style: normal;
-  font-size: 3.5rem;
+  font-size: 4.5rem;
   margin-bottom: 2.2rem;
-  }
+  text-shadow: #ff6ec4 4px 4px;
+  /* text-shadow: #ff6ec4 0px 0px 10px, #7873f5 0px 0px 20px; */
+}
 
 button {
   padding: 0.6rem 1.2rem;
-  font-size: 1rem;
+  font-size: 1.3rem;
   background-color: #908ce2;
   color: white;
   border: none;
@@ -109,6 +111,7 @@ button:disabled {
 .player-select label {
   margin: 0 1rem;
   font-weight: bold;
+  font-size: 1.2rem;
 }
 
 .slider-wrapper {
@@ -117,7 +120,7 @@ button:disabled {
   justify-content: center;
   gap: 1rem;
   margin: 2rem auto;
-  font-size: 1.2rem;
+  font-size: 1.5rem;
 }
 
 .slider-wrapper span {
@@ -225,6 +228,6 @@ button:disabled {
 
 .result {
   margin-top: 1.5rem;
-  font-size: 1.3rem;
+  font-size: 1.5rem;
   color: #2563eb;
 }

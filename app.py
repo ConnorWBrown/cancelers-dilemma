@@ -45,12 +45,16 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
+# Helper function to initialize game state
+def initialize_game_state():
+    return {
+        "player1": {"clicked": None, "ready": False},
+        "player2": {"clicked": None, "ready": False},
+        "results": {}
+    }
+
 # In-memory game state
-game_state = {
-    "player1": {"clicked": None, "ready": False},
-    "player2": {"clicked": None, "ready": False},
-    "results": {}
-}
+game_state = initialize_game_state()
 
 @app.route('/submit', methods=['POST'])
 def submit():
@@ -88,8 +92,8 @@ def submit():
             }
         else:
             game_state["results"] = {
-                "player1": "neither of you canceled",
-                "player2": "neither of you canceled"
+                "player1": "Neither of you canceled! Have fun!",
+                "player2": "Neither of you canceled! Have fun!"
             }
 
         game_state["player1"]["ready"] = False
@@ -110,11 +114,16 @@ def get_result(player_id):
     return response
 
 @app.route('/clear', methods=['POST'])
-def get_result(player_id):
-    result = game_state["results"].get(player_id)
-    response = jsonify({"result": result})
+def clear():
+    global game_state
+    game_state = {
+        "player1": {"clicked": None, "ready": False},
+        "player2": {"clicked": None, "ready": False},
+        "results": {}
+    }
+    response = jsonify({"message": "Game state cleared"})
     response.headers.add('Access-Control-Allow-Origin', '*')
-    # return response
+    return response
 
 if __name__ == '__main__':
     # Avoid using debug mode to prevent multiprocessing issues in sandboxed environments
