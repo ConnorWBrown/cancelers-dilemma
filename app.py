@@ -43,7 +43,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
 # In-memory game state
 game_state = {
@@ -95,7 +95,10 @@ def submit():
         game_state["player1"]["ready"] = False
         game_state["player2"]["ready"] = False
 
-        return jsonify({"result": game_state["results"][player_id]})
+        response = jsonify({"result": game_state["results"][player_id]})
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
+
 
     return jsonify({"waiting": True})
 
@@ -105,6 +108,13 @@ def get_result(player_id):
     response = jsonify({"result": result})
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
+
+@app.route('/clear', methods=['POST'])
+def get_result(player_id):
+    result = game_state["results"].get(player_id)
+    response = jsonify({"result": result})
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    # return response
 
 if __name__ == '__main__':
     # Avoid using debug mode to prevent multiprocessing issues in sandboxed environments
