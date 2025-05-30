@@ -74,10 +74,10 @@ function App() {
   };
 
   return (
-    <div className="App">
+    <div className={`App ${clicked ? 'dark' : 'light'}`}>
       <h1>Canceler's Dilemma</h1>
 
-      <div>
+      <div className="player-select">
         <label>
           <input
             type="radio"
@@ -100,22 +100,25 @@ function App() {
         </label>
       </div>
 
-      <div>
-        <label>
-          Yes
-          <input
-            type="checkbox"
-            checked={clicked}
-            onChange={() => setClicked(!clicked)}
-            disabled={submitted}
-          />
-        </label>
-      </div>
-
+      <div className="container">
+        <div className="slider-wrapper">
+          <span>To Hang</span>
+          <label className="switch">
+            <input
+              type="checkbox"
+              checked={clicked}
+              onChange={() => setClicked(!clicked)}
+              disabled={submitted}
+            />
+            <span className="slider round"></span>
+          </label>
+          <span>or Not to Hang</span>
+        </div>
+      </div> 
       <button onClick={handleSubmit} disabled={submitted}>Go</button>
 
-      {waiting && <p>Waiting for the other player...</p>}
-      {result && <p><strong>{result}</strong></p>}
+      {waiting && <p>⏳ Waiting for the other player...</p>}
+      {result && <p className="result"><strong>{result}</strong></p>}
     </div>
   );
 }

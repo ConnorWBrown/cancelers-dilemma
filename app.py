@@ -73,23 +73,23 @@ def submit():
 
         if p1 and p2:
             game_state["results"] = {
-                "player1": "both of you clicked",
-                "player2": "both of you clicked"
+                "player1": "Enjoy the couch :)",
+                "player2": "Enjoy the couch :)"
             }
         elif p1 and not p2:
             game_state["results"] = {
-                "player1": "only you clicked",
-                "player2": "only they clicked"
+                "player1": "Try this excuse: an opposum is hiding in my house and I must coax it out",
+                "player2": "Have fun!"
             }
         elif not p1 and p2:
             game_state["results"] = {
-                "player1": "only they clicked",
-                "player2": "only you clicked"
+                "player1": "Have fun!",
+                "player2": "Try this excuse: an opposum is hiding in my house and I must coax it out"
             }
         else:
             game_state["results"] = {
-                "player1": "neither of you clicked",
-                "player2": "neither of you clicked"
+                "player1": "neither of you canceled",
+                "player2": "neither of you canceled"
             }
 
         game_state["player1"]["ready"] = False
@@ -102,7 +102,9 @@ def submit():
 @app.route('/result/<player_id>', methods=['GET'])
 def get_result(player_id):
     result = game_state["results"].get(player_id)
-    return jsonify({"result": result})
+    response = jsonify({"result": result})
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
 
 if __name__ == '__main__':
     # Avoid using debug mode to prevent multiprocessing issues in sandboxed environments
