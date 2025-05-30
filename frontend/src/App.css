@@ -54,14 +54,14 @@
 
 /* Light theme */
 .light {
-  background-color: #f5f7fa;
-  color: #1f2937;
+  background-color: #bdc9db;
+  color: #4f46e5;
 }
 
 /* Dark theme */
 .dark {
-  background-color: #1f2937;
-  color: #f5f7fa;
+  background-color: #aac9b9;
+  color: #4f46e5;
 }
 
 h1 {
@@ -71,7 +71,7 @@ h1 {
 button {
   padding: 0.6rem 1.2rem;
   font-size: 1rem;
-  background-color: #4f46e5;
+  background-color: #908ce2;
   color: white;
   border: none;
   border-radius: 8px;
@@ -91,9 +91,9 @@ button:disabled {
   color: inherit;
 }
 
-h1 {
+/* h1 {
   color: #4f46e5;
-}
+} */
 
 .player-select {
   margin: 1rem 0;
