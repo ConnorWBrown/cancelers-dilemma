@@ -41,9 +41,10 @@
 # # Python Backend (Flask)
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+import random
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
+CORS(app, resources={r"/*": {"origins": ["http://172.20.10.2:3000", "http://localhost:3000"]}})
 
 # Helper function to initialize game state
 def initialize_game_state():
@@ -55,6 +56,41 @@ def initialize_game_state():
 
 # In-memory game state
 game_state = initialize_game_state()
+
+# Excuses:
+cancel_excuses = [
+    "an opposum is hiding in my house and I must coax it out",
+    "I have to wash my hair, even though I just did it yesterday",
+    "I’m in a committed relationship with my couch and we have plans",
+    "I’m currently in a staring contest with my cat and I can’t lose",
+    "I have to reorganize my sock drawer by color, size, and emotional significance",
+    "I’m in a deep philosophical debate with my houseplants about the meaning of life",
+    "I have to finish a very important Netflix documentary about cheese",
+    "I was emotionally ambitious when I made those plans",
+    "I’m currently in pajamas and the window to change has closed",
+    "Let’s pretend we hung out and it was amazing. Great job, us",
+    "I used all my social energy on a 3-minute phone call with the pharmacy",
+    "I'm not ghosting — I'm just buffering in real life",
+    "I can't make it. I’m deep in a spiral about whether avocados have feelings",
+    "My will to interact was last seen at 3pm. It has not returned",
+    "I need a night off from pretending I have it together",
+    "Today's vibe is ‘do nothing and overthink it.’ Raincheck?",
+    "Love you deeply, but I’ve entered goblin mode and there’s no turning back tonight",
+    
+    # Astrology excuses
+    "Mercury's in retrograde and so is my entire life",
+    "My birth chart says today is a ‘stay in and avoid all humans’ kind of day",
+    "The moon is in my feelings house and I cannot emotionally relocate",
+    "Saturn just gave me a performance review. I failed",
+    
+    # Apocalyptic emergencies
+    "The skies turned orange again and my motivation evaporated",
+    "Ran out of coffee and civilization shortly followed",
+    "My fridge is making a sound I can only describe as 'final warning'",
+    "I opened my email and unleashed a minor portal to another realm",
+    "It’s raining sideways and I took that personally",
+    "My existential dread needs a night in"
+]
 
 @app.route('/submit', methods=['POST'])
 def submit():
@@ -75,6 +111,9 @@ def submit():
         p1 = game_state["player1"]["clicked"]
         p2 = game_state["player2"]["clicked"]
 
+        # excuse = cancel_excuses[0]
+        excuse = cancel_excuses[random.randint(0, len(cancel_excuses) - 1)]
+
         if p1 and p2:
             game_state["results"] = {
                 "player1": "Enjoy the couch :)",
@@ -82,13 +121,16 @@ def submit():
             }
         elif p1 and not p2:
             game_state["results"] = {
-                "player1": "Try this excuse: an opposum is hiding in my house and I must coax it out",
+                # "player1": "Try this excuse: \"an opposum is hiding in my house and I must coax it out\"",
+                "player1": "Try this excuse: \"" + excuse + "\" if you would like to for-real cancel.",
                 "player2": "Have fun!"
             }
         elif not p1 and p2:
             game_state["results"] = {
                 "player1": "Have fun!",
-                "player2": "Try this excuse: an opposum is hiding in my house and I must coax it out"
+                # "player2": "Try this excuse: \"an opposum is hiding in my house and I must coax it out\""
+                "player2": "Try this excuse: \"" + excuse + "\" if you would like to for-real cancel."
+
             }
         else:
             game_state["results"] = {

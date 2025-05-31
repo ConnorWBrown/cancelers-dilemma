@@ -47,7 +47,7 @@ function App() {
     setWaiting(true);
     setSubmitted(true);
     try {
-      const response = await axios.post('http://127.0.0.1:5000/submit', {
+      const response = await axios.post('http://172.20.10.2:5000/submit', {
         player_id: playerId,
         clicked: clicked,
       });
@@ -55,7 +55,7 @@ function App() {
       if (response.data.waiting) {
         const interval = setInterval(async () => {
           try {
-            const res = await axios.get(`http://127.0.0.1:5000/result/${playerId}`);
+            const res = await axios.get(`http://172.20.10.2:5000/result/${playerId}`);
             if (res.data.result) {
               clearInterval(interval);
               setResult(res.data.result);
@@ -77,6 +77,7 @@ function App() {
 
   return (
     <div className={`App ${clicked ? 'dark' : 'light'}`}>
+      {/* <div className="box"> */}
       <h1>Canceler's Dilemma</h1>
 
       <div className="player-select">

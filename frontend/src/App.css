@@ -54,6 +54,26 @@
   min-height: 100vh;
 }
 
+.box {
+  max-width: 500px;
+  margin: 4rem auto;
+  padding: 2rem;
+  background-color: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  transition: background-color 1s, color 1s;
+}
+
+.app.dark .box {
+  background-color: #333;
+  color: white;
+}
+
+.app.light .box {
+  background-color: #f5f7fa;
+  color: #333;
+}
+
 /* Light theme */
 .light {
   background-color: #d2e0f4;
