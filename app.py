@@ -111,8 +111,8 @@ def submit():
         p1 = game_state["player1"]["clicked"]
         p2 = game_state["player2"]["clicked"]
 
-        # excuse = cancel_excuses[0]
-        excuse = cancel_excuses[random.randint(0, len(cancel_excuses) - 1)]
+        excuse = cancel_excuses[0]
+        # excuse = cancel_excuses[random.randint(0, len(cancel_excuses) - 1)]
 
         if p1 and p2:
             game_state["results"] = {

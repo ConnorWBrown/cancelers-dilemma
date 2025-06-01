@@ -77,7 +77,7 @@ function App() {
 
   return (
     <div className={`App ${clicked ? 'dark' : 'light'}`}>
-      {/* <div className="box"> */}
+      <div className="box">
       <h1>Canceler's Dilemma</h1>
 
       <div className="player-select">
@@ -122,6 +122,7 @@ function App() {
 
       {waiting && <p>⏳ Waiting for the other player...</p>}
       {result && <p className="result"><strong>{result}</strong></p>}
+    </div>
     </div>
   );
 }

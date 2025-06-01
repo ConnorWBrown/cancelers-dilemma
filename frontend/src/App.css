@@ -58,7 +58,7 @@
   max-width: 500px;
   margin: 4rem auto;
   padding: 2rem;
-  background-color: white;
+  background-color: rgb(246, 232, 255);
   border-radius: 16px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
   transition: background-color 1s, color 1s;
@@ -66,11 +66,11 @@
 
 .app.dark .box {
   background-color: #333;
-  color: white;
+  color: d2e2fb;
 }
 
 .app.light .box {
-  background-color: #f5f7fa;
+  background-color: #d2e2fb;
   color: #333;
 }
 
