@@ -8,3 +8,6 @@ TODO:
 
 Excuses:
 https://www.fancycomponents.dev/docs/components/text/typewriter
+
+Decision Selection:
+https://css-irl.info/animating-underlines/
