@@ -1,6 +1,33 @@
 # Canceler's Dilemma
 Want to cancel on plans, but I-don't-want-to-if-you-don't-want-to? Quite the prisoner's dilemma. How about if we both want to cancel, we both click here?
 
+Local Minikube Deployment:
+
+'''
+
+minikube start
+
+eval $(minikube docker-env)
+
+#next two might be overlapped
+
+docker build -t react-frontend:latest .                            
+docker tag react-frontend:latest docker.io/library/react-frontend:latest
+docker push docker.io/library/react-frontend:latest
+
+docker build -t flask-backend:latest .                            
+docker tag flask-backend:latest docker.io/library/flask-backend:latest
+docker push docker.io/library/flask-backend:latest
+
+docker tag flask-backend:latest connorwbrown/flask-backend:latest\ndocker push connorwbrown/flask-backend:latest
+
+docker tag react-frontend:latest connorwbrown/react-frontend:latest\ndocker push connorwbrown/react-frontend:latest
+
+kubectl apply -f k8s/backend-deployment.yml
+
+kubectl apply -f k8s/frontend-deployment.yml
+
+'''
 
 # Some Backlogged Feature Considerations:
 
@@ -11,3 +38,5 @@ https://www.fancycomponents.dev/docs/components/text/typewriter
 
 Decision Selection:
 https://css-irl.info/animating-underlines/
+
+
