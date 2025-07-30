@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: react-frontend
-          image: react-frontend:latest
+          image: docker.io/connorwbrown/react-frontend:latest
           ports:
             - containerPort: 80
 ---
