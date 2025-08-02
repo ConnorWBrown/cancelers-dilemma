@@ -47,7 +47,8 @@ function App() {
     setWaiting(true);
     setSubmitted(true);
     try {
-      const response = await axios.post('http://172.20.10.2:5000/submit', {
+      // const response = await axios.post('http://172.20.10.2:5000/submit', {
+      const response = await axios.post('http://backend.cancelers-dilemma.svc.cluster.local:5000/submit', {
         player_id: playerId,
         clicked: clicked,
       });
@@ -55,7 +56,8 @@ function App() {
       if (response.data.waiting) {
         const interval = setInterval(async () => {
           try {
-            const res = await axios.get(`http://172.20.10.2:5000/result/${playerId}`);
+            // const res = await axios.get(`http://172.20.10.2:5000/result/${playerId}`);
+            const res = await axios.get(`http://backend.cancelers-dilemma.svc.cluster.local:5000/result/${playerId}`);
             if (res.data.result) {
               clearInterval(interval);
               setResult(res.data.result);

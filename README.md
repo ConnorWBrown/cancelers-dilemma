@@ -11,17 +11,16 @@ eval $(minikube docker-env)
 
 #next two might be overlapped
 
-docker build -t react-frontend:latest .                            
-docker tag react-frontend:latest docker.io/library/react-frontend:latest
-docker push docker.io/library/react-frontend:latest
+docker build -t flask-backend:latest -f Dockerfile.backend .
+docker build -t react-frontend:latest -f Dockerfile.frontend .
 
 docker build -t flask-backend:latest .                            
 docker tag flask-backend:latest docker.io/library/flask-backend:latest
 docker push docker.io/library/flask-backend:latest
 
-docker tag flask-backend:latest connorwbrown/flask-backend:latest\ndocker push connorwbrown/flask-backend:latest
+docker tag flask-backend:latest connorwbrown/flask-backend:latest && docker push connorwbrown/flask-backend:latest
 
-docker tag react-frontend:latest connorwbrown/react-frontend:latest\ndocker push connorwbrown/react-frontend:latest
+docker tag react-frontend:latest connorwbrown/react-frontend:latest && docker push connorwbrown/react-frontend:latest
 
 kubectl apply -f k8s/backend-deployment.yml
 

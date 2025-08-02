@@ -44,7 +44,8 @@ from flask_cors import CORS
 import random
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": ["http://172.20.10.2:3000", "http://localhost:3000", "http://127.0.0.1:58244", "http://127.0.0.1:58214"]}})
+CORS(app)  # Enable CORS for all routes
+# CORS(app, resources={r"/*": {"origins": ["http://172.20.10.2:3000", "http://localhost:3000", "http://127.0.0.1:58244", "http://127.0.0.1:58214", "http://frontend.cancelers-dilemma.svc.cluster.local:80"]}})
 
 # Helper function to initialize game state
 def initialize_game_state():
