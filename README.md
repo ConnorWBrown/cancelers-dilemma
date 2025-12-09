@@ -14,9 +14,9 @@ eval $(minikube docker-env)
 docker build -t flask-backend:latest -f Dockerfile.backend .
 docker build -t react-frontend:latest -f Dockerfile.frontend .
 
-docker build -t flask-backend:latest .                            
-docker tag flask-backend:latest docker.io/library/flask-backend:latest
-docker push docker.io/library/flask-backend:latest
+<!-- docker build -t flask-backend:latest .                             -->
+<!-- docker tag flask-backend:latest docker.io/library/flask-backend:latest
+docker push docker.io/library/flask-backend:latest -->
 
 docker tag flask-backend:latest connorwbrown/flask-backend:latest && docker push connorwbrown/flask-backend:latest
 
@@ -28,10 +28,13 @@ kubectl apply -f k8s/frontend-deployment.yml
 
 '''
 
+minikube service -n cancelers-dilemma frontend --url
+# ^^^ gives the address I can access the FE from, and the 
+
 # Some Backlogged Feature Considerations:
 
 TODO: 
-
+ 
 Excuses:
 https://www.fancycomponents.dev/docs/components/text/typewriter
 

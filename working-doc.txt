@@ -1,8 +1,11 @@
-kubectl exec -it frontend-68767478fc-2vl2q -- curl -X POST http://backend.cancelers-dilemma.svc.cluster.local:5000/submit \
+fepod=$(kubectl get pods -l app=frontend -o jsonpath='{.items[0].metadata.name}')
+echo $fepod
+
+kubectl exec -it $fepod -- curl -X POST http://backend.cancelers-dilemma.svc.cluster.local:5000/submit \
   -H "Content-Type: application/json" \
   -d '{"player_id":"player2","clicked":false}'
 
-kubectl exec -it frontend-68767478fc-2vl2q -- curl -X POST http://backend.cancelers-dilemma.svc.cluster.local:5000/submit \
+kubectl exec -it $fepod -- curl -X POST http://backend.cancelers-dilemma.svc.cluster.local:5000/submit \
   -H "Content-Type: application/json" \
   -d '{"player_id":"player1","clicked":false}'
 
@@ -10,3 +13,4 @@ kubectl exec -it frontend-68767478fc-2vl2q -- curl -X POST http://backend.cancel
 
 
 
+kubectl exec -it $fepod -- curl -X GET http://backend.cancelers-dilemma.svc.cluster.local:5000/result/player1
