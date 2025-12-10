@@ -26,7 +26,9 @@
 
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { generate } from "random-words";
 import './App.css';
+import { v4 as uuidv4 } from 'uuid';
 
 
 
@@ -38,10 +40,17 @@ function App() {
   const [playerId, setPlayerId] = useState(() => {
     return localStorage.getItem('playerId') || 'player1';
   });
+  const [gameId, setGameId] = useState(() => {
+    return localStorage.getItem('gameId') || uuidv4();
+  });
 
   useEffect(() => {
     localStorage.setItem('playerId', playerId);
   }, [playerId]);
+
+  const newEvent = async () => {
+    setGameId(uuidv4());
+  };
 
   const handleSubmit = async () => {
     setWaiting(true);
@@ -83,7 +92,8 @@ function App() {
     <div className={`App ${clicked ? 'dark' : 'light'}`}>
       <div className="box">
       <h1>Canceler's Dilemma</h1>
-
+      <div>Current event: {generate({ exactly: 3, join:"-", minLength: 4, maxLength: 5, seed:gameId })}</div>
+      <button onClick={newEvent} disabled={submitted}>Create New Event</button>
       <div className="player-select">
         <label>
           <input

@@ -31,10 +31,21 @@ kubectl apply -f k8s/frontend-deployment.yml
 minikube service -n cancelers-dilemma frontend --url
 # ^^^ gives the address I can access the FE from, and the 
 
+
+Local:
+
+node run build
+
 # Some Backlogged Feature Considerations:
 
 TODO: 
- 
+
+UUIDs
+
+Multiplayer
+
+Setup with calendar event
+
 Excuses:
 https://www.fancycomponents.dev/docs/components/text/typewriter
 

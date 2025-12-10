@@ -42,6 +42,8 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import random
+from flask import request
+
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
@@ -164,6 +166,7 @@ def clear():
         "player2": {"clicked": None, "ready": False},
         "results": {}
     }
+    event = request.args.get('event')
     response = jsonify({"message": "Game state cleared"})
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
