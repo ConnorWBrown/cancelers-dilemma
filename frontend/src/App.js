@@ -26,9 +26,13 @@
 
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { generate } from "random-words";
+// import { generate } from "random-words";
 import './App.css';
 import { v4 as uuidv4 } from 'uuid';
+
+// Use env var for backend base URL so we can swap between local dev and cluster easily.
+// Example: REACT_APP_API_URL=http://127.0.0.1:49831 npm start
+const API_BASE = process.env.REACT_APP_API_URL || 'http://127.0.0.1:5000';
 
 
 
@@ -41,15 +45,50 @@ function App() {
     return localStorage.getItem('playerId') || 'player1';
   });
   const [gameId, setGameId] = useState(() => {
-    return localStorage.getItem('gameId') || uuidv4();
+    // Priority: URL query param (?gameId=...) or bare query (?<id>) -> localStorage -> new uuid
+    try {
+      const params = new URLSearchParams(window.location.search);
+      // check explicit key
+      let id = params.get('gameId') || params.get('id');
+      if (!id) {
+        // handle bare query like /?8a7f... (no key)
+        const raw = window.location.search.replace(/^\?/, '');
+        if (raw) {
+          id = raw;
+        }
+      }
+      if (id) {
+        return id;
+      }
+    } catch (e) {
+      // ignore and fallback
+    }
+    return localStorage.getItem('gameId');
   });
 
   useEffect(() => {
     localStorage.setItem('playerId', playerId);
   }, [playerId]);
 
+  useEffect(() => {
+    // persist gameId so reloads keep the same game unless overridden by URL
+    if (gameId) localStorage.setItem('gameId', gameId);
+  }, [gameId]);
+
+  useEffect(() => {
+    // reflect current gameId in the URL so it can be shared: /?{gameId}
+    try {
+      const newSearch = '?' + encodeURIComponent(gameId);
+      if (window.location.search !== newSearch) {
+        window.history.replaceState(null, '', window.location.pathname + newSearch);
+      }
+    } catch (e) {
+      // ignore
+    }
+  }, [gameId]);
+
   const newEvent = async () => {
-    setGameId(uuidv4());
+    setGameId(uuidv4().substring(0, 8));
   };
 
   const handleSubmit = async () => {
@@ -58,17 +97,18 @@ function App() {
     try {
       // const response = await axios.post('http://172.20.10.2:5000/submit', {
       // const response = await axios.post('http://backend.cancelers-dilemma.svc.cluster.local:5000/submit', {
-      const response = await axios.post('http://192.168.49.2:30500/submit', {
+      // include gameId so backend can persist multiple gamestates
+      const response = await axios.post(`${API_BASE}/submit`, {
         player_id: playerId,
         clicked: clicked,
+        game_id: gameId,
       });
 
       if (response.data.waiting) {
         const interval = setInterval(async () => {
           try {
-            // const res = await axios.get(`http://172.20.10.2:5000/result/${playerId}`);
-            // const res = await axios.get(`http://backend.cancelers-dilemma.svc.cluster.local:5000/result/${playerId}`);
-            const res = await axios.get(`http://192.168.49.2:30500/result/${playerId}`);
+            // Poll using gameId so we get the right gamestate
+            const res = await axios.get(`${API_BASE}/result/${gameId}/${playerId}`);
             if (res.data.result) {
               clearInterval(interval);
               setResult(res.data.result);
@@ -92,8 +132,9 @@ function App() {
     <div className={`App ${clicked ? 'dark' : 'light'}`}>
       <div className="box">
       <h1>Canceler's Dilemma</h1>
-      <div>Current event: {generate({ exactly: 3, join:"-", minLength: 4, maxLength: 5, seed:gameId })}</div>
-      <button onClick={newEvent} disabled={submitted}>Create New Event</button>
+      {/* <div>Current event: {generate({ exactly: 3, join:"-", minLength: 4, maxLength: 5, seed:gameId })}</div> */}
+      <div>Current event: {gameId}</div>
+      <button onClick={newEvent} >Create New Event</button>
       <div className="player-select">
         <label>
           <input

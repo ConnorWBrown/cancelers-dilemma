@@ -43,22 +43,47 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import random
 from flask import request
+from flask_sqlalchemy import SQLAlchemy
+import uuid
+import json
+from datetime import datetime
 
 
 app = Flask(__name__)
+# Simple SQLite DB in project root; change as needed for production
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///games.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
+
 CORS(app)  # Enable CORS for all routes
-CORS(app, resources={r"/*": {"origins": ["http://192.168.49.2:30500", "http://172.20.10.2:3000", "http://localhost:3000", "http://127.0.0.1:58244", "http://127.0.0.1:58214", "http://frontend.cancelers-dilemma.svc.cluster.local:80", "http://backend.cancelers-dilemma.svc.cluster.local:80"]}})
+CORS(app, resources={r"/*": {"origins": ["http://192.168.49.2:30500", "http://192.168.1.24:3000", "http://172.20.10.2:3000", "http://localhost:3000", "http://127.0.0.1:58244", "http://127.0.0.1:58214", "http://frontend.cancelers-dilemma.svc.cluster.local:80", "http://backend.cancelers-dilemma.svc.cluster.local:80"]}})
 
-# Helper function to initialize game state
-def initialize_game_state():
-    return {
-        "player1": {"clicked": None, "ready": False},
-        "player2": {"clicked": None, "ready": False},
-        "results": {}
-    }
 
-# In-memory game state
-game_state = initialize_game_state()
+class Game(db.Model):
+    __tablename__ = 'games'
+    id = db.Column(db.String(36), primary_key=True)
+    player1_clicked = db.Column(db.Boolean, nullable=True)
+    player1_ready = db.Column(db.Boolean, default=False)
+    player2_clicked = db.Column(db.Boolean, nullable=True)
+    player2_ready = db.Column(db.Boolean, default=False)
+    results = db.Column(db.Text, default='{}')
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'player1_clicked': self.player1_clicked,
+            'player1_ready': self.player1_ready,
+            'player2_clicked': self.player2_clicked,
+            'player2_ready': self.player2_ready,
+            'results': json.loads(self.results) if self.results else {},
+            'created_at': self.created_at.isoformat() if self.created_at else None
+        }
+
+
+with app.app_context():
+    db.create_all()
 
 # Excuses:
 cancel_excuses = [
@@ -97,80 +122,102 @@ cancel_excuses = [
 
 @app.route('/submit', methods=['POST'])
 def submit():
+    # Expecting: { player_id: 'player1'|'player2', clicked: bool, optional game_id: uuid }
     data = request.get_json()
     if not data or 'player_id' not in data or 'clicked' not in data:
         return jsonify({"error": "Invalid input"}), 400
 
     player_id = data['player_id']
     clicked = data['clicked']
+    game_id = data.get('game_id')
 
-    if player_id not in game_state:
+    if player_id not in ('player1', 'player2'):
         return jsonify({"error": "Invalid player_id"}), 400
 
-    game_state[player_id]["clicked"] = clicked
-    game_state[player_id]["ready"] = True
+    # create new game if no game_id provided
+    if not game_id:
+        game_id = str(uuid.uuid4())[:8]
+        game = Game(id=game_id)
+        db.session.add(game)
+        db.session.commit()
+    else:
+        game = Game.query.get(game_id)
+        if not game:
+            # create new game with provided id
+            game = Game(id=game_id)
+            db.session.add(game)
+            db.session.commit()
 
-    if all(p["ready"] for p in [game_state["player1"], game_state["player2"]]):
-        p1 = game_state["player1"]["clicked"]
-        p2 = game_state["player2"]["clicked"]
+    # update player state
+    if player_id == 'player1':
+        game.player1_clicked = bool(clicked)
+        game.player1_ready = True
+    else:
+        game.player2_clicked = bool(clicked)
+        game.player2_ready = True
+
+    db.session.commit()
+
+    # If both ready -> compute result
+    if (game.player1_ready or game.player1_clicked is not None) and (game.player2_ready or game.player2_clicked is not None) and game.player1_ready and game.player2_ready:
+        p1 = bool(game.player1_clicked)
+        p2 = bool(game.player2_clicked)
 
         excuse = cancel_excuses[0]
-        # excuse = cancel_excuses[random.randint(0, len(cancel_excuses) - 1)]
 
+        results = {}
         if p1 and p2:
-            game_state["results"] = {
-                "player1": "Enjoy the couch :)",
-                "player2": "Enjoy the couch :)"
-            }
+            results = {"player1": "Enjoy the couch :)", "player2": "Enjoy the couch :)"}
         elif p1 and not p2:
-            game_state["results"] = {
-                # "player1": "Try this excuse: \"an opposum is hiding in my house and I must coax it out\"",
-                "player1": "Try this excuse: \"" + excuse + "\" if you would like to for-real cancel.",
-                "player2": "Have fun!"
-            }
+            results = {"player1": "Try this excuse: \"" + excuse + "\" if you would like to for-real cancel.", "player2": "Have fun!"}
         elif not p1 and p2:
-            game_state["results"] = {
-                "player1": "Have fun!",
-                # "player2": "Try this excuse: \"an opposum is hiding in my house and I must coax it out\""
-                "player2": "Try this excuse: \"" + excuse + "\" if you would like to for-real cancel."
-
-            }
+            results = {"player1": "Have fun!", "player2": "Try this excuse: \"" + excuse + "\" if you would like to for-real cancel."}
         else:
-            game_state["results"] = {
-                "player1": "Neither of you canceled! Have fun!",
-                "player2": "Neither of you canceled! Have fun!"
-            }
+            results = {"player1": "Neither of you canceled! Have fun!", "player2": "Neither of you canceled! Have fun!"}
 
-        game_state["player1"]["ready"] = False
-        game_state["player2"]["ready"] = False
+        game.results = json.dumps(results)
+        # reset ready flags for next round
+        game.player1_ready = False
+        game.player2_ready = False
+        db.session.commit()
 
-        response = jsonify({"result": game_state["results"][player_id]})
+        response = jsonify({"game_id": game.id, "result": results[player_id]})
         response.headers.add('Access-Control-Allow-Origin', '*')
         return response
 
+    # otherwise indicate to caller that we are waiting. return game_id so client can poll
+    return jsonify({"waiting": True, "game_id": game.id})
 
-    return jsonify({"waiting": True})
+@app.route('/result/<game_id>/<player_id>', methods=['GET'])
+def get_result(game_id, player_id):
+    game = Game.query.get(game_id)
+    if not game:
+        return jsonify({"error": "Game not found"}), 404
 
-@app.route('/result/<player_id>', methods=['GET'])
-def get_result(player_id):
-    result = game_state["results"].get(player_id)
+    results = json.loads(game.results) if game.results else {}
+    result = results.get(player_id)
     response = jsonify({"result": result})
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
+
 @app.route('/clear', methods=['POST'])
 def clear():
-    global game_state
-    game_state = {
-        "player1": {"clicked": None, "ready": False},
-        "player2": {"clicked": None, "ready": False},
-        "results": {}
-    }
-    event = request.args.get('event')
-    response = jsonify({"message": "Game state cleared"})
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    return response
+    # If game_id provided, clear that game; otherwise clear all games
+    game_id = request.args.get('game_id')
+    if game_id:
+        game = Game.query.get(game_id)
+        if not game:
+            return jsonify({"error": "Game not found"}), 404
+        db.session.delete(game)
+        db.session.commit()
+        return jsonify({"message": f"Game {game_id} cleared"})
+    else:
+        # clear all
+        num = Game.query.delete()
+        db.session.commit()
+        return jsonify({"message": f"Cleared {num} games"})
 
 if __name__ == '__main__':
     # Avoid using debug mode to prevent multiprocessing issues in sandboxed environments
-    app.run(host='0.0.0.0', port=5000, debug=False)
+    app.run(port=30500, debug=False)

@@ -16,6 +16,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "start-minikube": "sh -lc 'URL=$(minikube service -n cancelers-dilemma backend --url) && echo Using backend: $URL && REACT_APP_API_URL=$URL react-scripts start'",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

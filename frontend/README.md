@@ -47,6 +47,33 @@ To learn React, check out the [React documentation](https://reactjs.org/).
 
 ### Code Splitting
 
+## Using the Minikube backend (convenience)
+
+If your backend is running in Minikube (namespace `cancelers-dilemma` with Service name `backend`) you can start the frontend dev server with the proper backend URL injected automatically.
+
+This script queries Minikube for the forwarded localhost URL (e.g. http://127.0.0.1:49831) and starts the dev server with REACT_APP_API_URL set.
+
+Run from the `frontend` directory:
+
+```bash
+npm run start-minikube
+```
+
+You can also run the command manually to inspect the URL first:
+
+```bash
+# prints e.g. http://127.0.0.1:49831
+minikube service -n cancelers-dilemma backend --url
+
+# then start the dev server with that URL
+REACT_APP_API_URL=http://127.0.0.1:49831 npm start
+```
+
+Notes:
+- `REACT_APP_API_URL` is read at build/start time by Create React App. When using `npm start` or `npm run start-minikube` the dev server picks up the environment variable from your shell.
+- If you prefer to use the cluster NodePort (nodeIP:nodePort) instead, set `REACT_APP_API_URL` to that address.
+
+
 This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
 
 ### Analyzing the Bundle Size
