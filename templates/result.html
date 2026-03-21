@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Results - Cancelers Dilemma</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        
+        .result {
+            margin-bottom: 30px;
+        }
+        
+        .result-message {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .both-cancelled {
+            color: #4caf50;
+        }
+        
+        .have-fun {
+            color: #ff9800;
+        }
+        
+        .emoji {
+            font-size: 48px;
+            margin: 20px 0;
+        }
+        
+        .back-button {
+            display: inline-block;
+            padding: 14px 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Results!</h1>
+        
+        <div class="result">
+            {% if result == 'both_cancelled' %}
+                <div class="emoji">✓</div>
+                <p class="result-message both-cancelled">You both cancelled! Congrats.</p>
+                <p style="color: #666; margin-top: 15px;">You managed to coordinate and avoid the event together!</p>
+            {% else %}
+                <div class="emoji">🎉</div>
+                <p class="result-message have-fun">Have fun at the event!</p>
+                <p style="color: #666; margin-top: 15px;">At least one of you is going. Time to celebrate!</p>
+            {% endif %}
+        </div>
+        
+        <a href="{{ url_for('index') }}" class="back-button">Play Again</a>
+    </div>
+</body>
+</html>
