@@ -9,6 +9,7 @@ instance/
 .env.*
 *.db
 *.db-journal
+venv/
 
 # Flask/SQLAlchemy
 games.db
