@@ -132,7 +132,7 @@
         
         <div class="join-section">
             <h3>Share this link with Player 2:</h3>
-            <div class="join-url" id="joinUrl">{{ join_url }}</div>
+            <div class="join-url" id="joinUrl" onclick="copyToClipboard()" title="Click to copy the link">{{ join_url }}</div>
             <button class="copy-button" onclick="copyToClipboard()">Copy Link</button>
             <div class="copy-feedback" id="copyFeedback">Copied to clipboard!</div>
         </div>

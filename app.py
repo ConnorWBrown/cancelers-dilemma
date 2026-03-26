@@ -60,7 +60,7 @@ def create_event():
 @app.route('/event/<event_id>')
 def event_page(event_id):
     """Display the event page where a user makes their choice."""
-    event = Event.query.get(event_id)
+    event = db.session.get(Event, event_id)
     
     if not event:
         flash('Event not found.', 'error')
@@ -83,7 +83,7 @@ def event_page(event_id):
 @app.route('/event/<event_id>/submit', methods=['POST'])
 def submit_choice(event_id):
     """Process user's choice submission."""
-    event = Event.query.get(event_id)
+    event = db.session.get(Event, event_id)
     
     if not event:
         flash('Event not found.', 'error')
@@ -114,7 +114,7 @@ def submit_choice(event_id):
 @app.route('/event/<event_id>/waiting')
 def waiting_page(event_id):
     """Show waiting page until both users have submitted."""
-    event = Event.query.get(event_id)
+    event = db.session.get(Event, event_id)
     
     if not event:
         flash('Event not found.', 'error')
@@ -134,7 +134,7 @@ def waiting_page(event_id):
 @app.route('/event/<event_id>/result')
 def result_page(event_id):
     """Display the result of the game."""
-    event = Event.query.get(event_id)
+    event = db.session.get(Event, event_id)
     
     if not event:
         flash('Event not found.', 'error')
@@ -151,7 +151,7 @@ def result_page(event_id):
 @app.route('/event/<event_id>/status')
 def event_status(event_id):
     """API endpoint to check if both users have submitted (for AJAX polling)."""
-    event = Event.query.get(event_id)
+    event = db.session.get(Event, event_id)
     
     if not event:
         return {'error': 'Event not found'}, 404
