@@ -35,3 +35,11 @@ frontend/.env.*
 *.swp
 *.swo
 *~
+instance/cancelers_dilemma.db
+venv/bin/activate
+venv/bin/activate.csh
+venv/bin/activate.fish
+venv/bin/flask
+venv/bin/pip
+venv/bin/pip3
+venv/pyvenv.cfg
