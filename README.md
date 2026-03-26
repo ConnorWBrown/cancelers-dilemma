@@ -65,6 +65,28 @@ kubectl rollout status deployment/backend -n cancelers-dilemma
 
 There's a `frontend/.env.example` file showing how to set `REACT_APP_API_URL` for local development. Copy it to `frontend/.env.development` or set the env var in your shell before starting the dev server.
 
+### Frontend deployment helper
+
+I added a helper script for the frontend similar to the backend script. It builds the frontend Docker image, tags it (default Docker user `connorwbrown`), pushes the image to the registry, and updates the `frontend` Deployment in the `cancelers-dilemma` namespace.
+
+Usage (from repo root):
+
+```bash
+# optional: set DOCKER_USER if you push to your own registry account
+DOCKER_USER=connorwbrown ./deploy-frontend.sh
+```
+
+Like the backend script, if you prefer to build directly into Minikube's Docker daemon (no push) you can do:
+
+```bash
+eval $(minikube docker-env)
+# docker build -t react-frontend:latest -f Dockerfile.frontend ./frontend || docker build -t react-frontend:latest -f Dockerfile.frontend .
+docker build -t react-frontend:latest -f Dockerfile.frontend .
+kubectl rollout restart deployment/frontend -n cancelers-dilemma
+kubectl rollout status deployment/frontend -n cancelers-dilemma
+```
+
+
 
 # Some Backlogged Feature Considerations:
 

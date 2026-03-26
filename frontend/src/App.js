@@ -26,7 +26,7 @@
 
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-// import { generate } from "random-words";
+import { generate } from "random-words";
 import './App.css';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -45,25 +45,33 @@ function App() {
     return localStorage.getItem('playerId') || 'player1';
   });
   const [gameId, setGameId] = useState(() => {
-    // Priority: URL query param (?gameId=...) or bare query (?<id>) -> localStorage -> new uuid
+    // Validate candidate id values
+    const valid = (s) => s && s !== 'undefined' && s !== 'null' && String(s).trim() !== '';
+
+    // If there are no query params at all, ALWAYS generate a new id (landing on root)
+    const rawSearch = window.location.search || '';
+    const hasQuery = rawSearch.length > 1; // "" or "?" mean no useful params
+    if (!hasQuery) {
+      return generate({ exactly: 3, join: "-", minLength: 4, maxLength: 5, seed: uuidv4() });
+    }
+
+    // Otherwise try to read an id from ?gameId= or ?id= or bare ?<id>
     try {
-      const params = new URLSearchParams(window.location.search);
-      // check explicit key
+      const params = new URLSearchParams(rawSearch);
       let id = params.get('gameId') || params.get('id');
-      if (!id) {
-        // handle bare query like /?8a7f... (no key)
-        const raw = window.location.search.replace(/^\?/, '');
-        if (raw) {
-          id = raw;
-        }
+      if (!valid(id)) {
+        const raw = rawSearch.replace(/^\?/, '');
+        if (valid(raw)) id = raw;
+        else id = null;
       }
-      if (id) {
-        return id;
-      }
+      if (valid(id)) return id;
     } catch (e) {
       // ignore and fallback
     }
-    return localStorage.getItem('gameId');
+
+    const stored = localStorage.getItem('gameId');
+    if (valid(stored)) return stored;
+    return generate({ exactly: 3, join: "-", minLength: 4, maxLength: 5, seed: uuidv4() });
   });
 
   useEffect(() => {
@@ -74,6 +82,29 @@ function App() {
     // persist gameId so reloads keep the same game unless overridden by URL
     if (gameId) localStorage.setItem('gameId', gameId);
   }, [gameId]);
+
+  // share button state & handler
+  const [shareCopied, setShareCopied] = useState(false);
+
+  const handleShare = async () => {
+    try {
+      const url = window.location.href;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(url);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = url;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 2000);
+    } catch (e) {
+      console.error('Share failed', e);
+    }
+  };
 
   useEffect(() => {
     // reflect current gameId in the URL so it can be shared: /?{gameId}
@@ -88,7 +119,8 @@ function App() {
   }, [gameId]);
 
   const newEvent = async () => {
-    setGameId(uuidv4().substring(0, 8));
+    // setGameId(uuidv4().substring(0, 8));
+    setGameId(generate({ exactly: 3, join: "-", minLength: 4, maxLength: 5, seed: uuidv4() }));
   };
 
   const handleSubmit = async () => {
@@ -133,8 +165,10 @@ function App() {
       <div className="box">
       <h1>Canceler's Dilemma</h1>
       {/* <div>Current event: {generate({ exactly: 3, join:"-", minLength: 4, maxLength: 5, seed:gameId })}</div> */}
-      <div>Current event: {gameId}</div>
-      <button onClick={newEvent} >Create New Event</button>
+      <span>Current event: {gameId}</span>
+      <span style={{ display: 'inline-flex', gap: '8px', alignItems: 'center' }}>
+        <button onClick={handleShare}>{shareCopied ? 'Copied!' : 'Share'}</button>
+      </span>
       <div className="player-select">
         <label>
           <input
@@ -177,6 +211,9 @@ function App() {
 
       {waiting && <p>⏳ Waiting for the other player...</p>}
       {result && <p className="result"><strong>{result}</strong></p>}
+      <div> </div>
+      <button onClick={newEvent} >Create New Event</button>
+
     </div>
     </div>
   );
