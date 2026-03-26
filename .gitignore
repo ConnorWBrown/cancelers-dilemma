@@ -1,1 +1,35 @@
-instance/*
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+instance/
+.env
+.env.*
+*.db
+*.db-journal
+
+# Flask/SQLAlchemy
+games.db
+
+# VSCode
+.vscode/
+.history/
+
+# macOS
+.DS_Store
+
+# Node/React frontend
+frontend/node_modules/
+frontend/build/
+frontend/.env
+frontend/.env.*
+
+# Docker
+*.log
+
+# General
+*.swp
+*.swo
+*~
